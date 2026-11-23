@@ -1,73 +1,133 @@
-import { useState } from "react";
-import AppHeader from "./components/AppHeader";
-import StatistikTokoh from "./components/StatistikTokoh";
-import FormTokoh from "./components/FormTokoh";
-import DaftarTokoh from "./components/DaftarTokoh";
-import AppFooter from "./components/AppFooter";
-import "./App.css";
 
-const dataAwal = [
-  {
-    id: "tokoh-1",
-    nama: "R.A. Kartini",
-    negara: "Indonesia",
-    peran: "Pelopor emansipasi perempuan",
-    biografi:
-      "R.A. Kartini dikenal melalui pemikirannya tentang pendidikan dan kesetaraan kesempatan bagi perempuan.",
-  },
-  {
-    id: "tokoh-2",
-    nama: "Soekarno",
-    negara: "Indonesia",
-    peran: "Proklamator dan presiden pertama",
-    biografi:
-      "Soekarno berperan penting dalam perjuangan kemerdekaan Indonesia dan membacakan teks proklamasi pada 17 Agustus 1945.",
-  },
-  {
-    id: "tokoh-3",
-    nama: "Marie Curie",
-    negara: "Polandia dan Prancis",
-    peran: "Ilmuwan fisika dan kimia",
-    biografi:
-      "Marie Curie melakukan penelitian penting tentang radioaktivitas dan menjadi perempuan pertama yang menerima Hadiah Nobel.",
-  },
-];
+import { useEffect, useState } from 'react';
+
+import AppHeader from './components/AppHeader';
+import StatistikTokoh from './components/StatistikTokoh';
+import FormTokoh from './components/FormTokoh';
+import DaftarTokoh from './components/DaftarTokoh';
+import AppFooter from './components/AppFooter';
+
+import {
+  getTokoh,
+  tambahTokoh as tambahTokohAPI,
+  updateTokoh as updateTokohAPI,
+  hapusTokoh as hapusTokohAPI,
+} from './services/api';
+
+import './App.css';
 
 function App() {
-  const [tokohList, setTokohList] = useState(dataAwal);
+  const [tokohList, setTokohList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [tokohEdit, setTokohEdit] = useState(null);
 
-  function tambahTokoh(tokohBaru) {
-    setTokohList((daftarSebelumnya) => [
-      ...daftarSebelumnya,
-      tokohBaru,
-    ]);
-  }
+  // GET: Mengambil data dari backend
+  useEffect(() => {
+    const ambilDataTokoh = async () => {
+      try {
+        const data = await getTokoh();
+        setTokohList(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  function hapusTokoh(id) {
-    setTokohList((daftarSebelumnya) =>
-      daftarSebelumnya.filter((tokoh) => tokoh.id !== id)
-    );
-  }
+    ambilDataTokoh();
+  }, []);
+
+  // POST: Menambahkan tokoh
+  const tambahTokoh = async (tokohBaru) => {
+    try {
+      const data = await tambahTokohAPI(tokohBaru);
+
+      setTokohList((daftarSebelumnya) => [
+        ...daftarSebelumnya,
+        data,
+      ]);
+
+      setError('');
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    }
+  };
+
+  // PATCH: Mengubah data tokoh
+  const editTokoh = async (id, dataBaru) => {
+    try {
+      const data = await updateTokohAPI(id, dataBaru);
+
+      setTokohList((daftarSebelumnya) =>
+        daftarSebelumnya.map((tokoh) =>
+          tokoh.id === id ? data : tokoh
+        )
+      );
+
+      setTokohEdit(null);
+      setError('');
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    }
+  };
+
+  // DELETE: Menghapus tokoh
+  const hapusTokoh = async (id) => {
+    try {
+      await hapusTokohAPI(id);
+
+      setTokohList((daftarSebelumnya) =>
+        daftarSebelumnya.filter((tokoh) => tokoh.id !== id)
+      );
+
+      if (tokohEdit?.id === id) {
+        setTokohEdit(null);
+      }
+
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
-    <div className="app-container">
+    <>
       <AppHeader />
 
-      <main className="main-content">
+      <main className="container">
         <StatistikTokoh jumlah={tokohList.length} />
 
-        <div className="layout-grid">
-          <FormTokoh onTambah={tambahTokoh} />
+        {error && (
+          <p className="error-message">{error}</p>
+        )}
 
-          <DaftarTokoh
-            tokohList={tokohList}
-            onHapus={hapusTokoh}
-          />
-        </div>
+        {loading ? (
+          <p>Memuat data tokoh sejarah...</p>
+        ) : (
+          <>
+            <FormTokoh
+              onTambah={tambahTokoh}
+              onUpdate={editTokoh}
+              tokohEdit={tokohEdit}
+              onBatalEdit={() => setTokohEdit(null)}
+            />
+
+            <DaftarTokoh
+              tokohList={tokohList}
+              onHapus={hapusTokoh}
+              onEdit={setTokohEdit}
+            />
+          </>
+        )}
       </main>
 
       <AppFooter />
-    </div>
+    </>
   );
 }
 

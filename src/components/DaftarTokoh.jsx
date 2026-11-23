@@ -1,6 +1,7 @@
+
 import KartuTokoh from "./KartuTokoh";
 
-function DaftarTokoh({ tokohList, onHapus }) {
+function DaftarTokoh({ tokohList, onHapus, onEdit }) {
   return (
     <section className="panel daftar-panel">
       <h2>Daftar Tokoh Sejarah</h2>
@@ -19,6 +20,7 @@ function DaftarTokoh({ tokohList, onHapus }) {
               key={tokoh.id}
               tokoh={tokoh}
               onHapus={onHapus}
+              onEdit={onEdit}
             />
           ))}
         </div>

@@ -1,0 +1,58 @@
+### GET - Mengambil semua tokoh sejarah
+GET http://localhost:3000/tokoh-sejarah
+
+
+### POST - Menambahkan tokoh sejarah
+POST http://localhost:3000/tokoh-sejarah
+Content-Type: application/json
+
+{
+  "nama": "Albert Einstein",
+  "negara": "Jerman",
+  "peran": "Ilmuwan fisika",
+  "biografi": "Ilmuwan yang mengembangkan teori relativitas dan berkontribusi besar dalam perkembangan fisika modern.",
+  "tahunLahir": 1879,
+}
+
+
+### PATCH - Mengubah data tokoh sejarah
+PATCH http://localhost:3000/tokoh-sejarah/4
+Content-Type: application/json
+
+{
+  "negara": "Jerman",
+  "peran": "Fisikawan teoretis",
+  "biografi": "Albert Einstein adalah ilmuwan fisika yang terkenal dengan teori relativitas khusus dan umum."
+}
+
+
+
+### DELETE - Menghapus tokoh sejarah
+DELETE http://localhost:3000/tokoh-sejarah/4
+
+### POST - Menguji validasi nama terlalu pendek
+POST http://localhost:3000/tokoh-sejarah
+Content-Type: application/json
+
+{
+  "nama": "AB",
+  "negara": "Indonesia",
+  "peran": "Tokoh sejarah",
+  "biografi": "Tokoh sejarah yang memiliki peran penting.",
+  "tahunLahir": 1900,
+}
+
+### GET - Menguji tokoh yang tidak ditemukan
+GET http://localhost:3000/tokoh-sejarah/999
+
+### POST - Menguji nama tokoh duplikat
+POST http://localhost:3000/tokoh-sejarah
+Content-Type: application/json
+
+{
+  "nama": "R.A. Kartini",
+  "negara": "Indonesia",
+  "peran": "Pelopor emansipasi perempuan",
+  "biografi": "Tokoh yang memperjuangkan pendidikan perempuan Indonesia.",
+  "tahunLahir": 1879,
+}

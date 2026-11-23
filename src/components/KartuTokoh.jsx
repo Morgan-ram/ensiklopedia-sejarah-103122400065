@@ -1,4 +1,5 @@
-function KartuTokoh({ tokoh, onHapus }) {
+
+function KartuTokoh({ tokoh, onHapus, onEdit }) {
   return (
     <article className="kartu-tokoh">
       <div className="kartu-ikon">🏛️</div>
@@ -8,6 +9,15 @@ function KartuTokoh({ tokoh, onHapus }) {
         <h3>{tokoh.nama}</h3>
         <p className="peran">{tokoh.peran}</p>
         <p className="biografi">{tokoh.biografi}</p>
+        <p>Tahun lahir: {tokoh.tahunLahir}</p>
+
+        <button
+          type="button"
+          className="btn-edit"
+          onClick={() => onEdit(tokoh)}
+        >
+          Edit tokoh
+        </button>
 
         <button
           type="button"
